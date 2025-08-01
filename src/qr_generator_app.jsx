@@ -19,22 +19,42 @@ export default function QRCodeGenerator() {
     }
   }, [qrValue]);
 
-  const generateQRCode = () => {
-    if (window.QRious && canvasRef.current) {
-      try {
-        const qr = new window.QRious({
-          element: canvasRef.current,
-          value: qrValue,
-          size: 300,
-          background: 'white',
-          foreground: 'black',
-          level: 'M'
-        });
-      } catch (error) {
-        console.error('QR Code generation error:', error);
-      }
+const generateQRCode = () => {
+  if (window.QRious && canvasRef.current) {
+    try {
+      const qrSize = 300;
+      const qr = new window.QRious({
+        element: canvasRef.current,
+        value: qrValue,
+        size: qrSize,
+        background: 'white',
+        foreground: 'black',
+        level: 'M'
+      });
+
+      // Load your logo
+      const logo = new Image();
+      logo.src = null; 
+
+      logo.onload = () => {
+        const ctx = canvasRef.current.getContext('2d');
+        const logoSize = qrSize * 0.3; // 20% of QR code size
+        const x = (qrSize - logoSize) / 2;
+        const y = (qrSize - logoSize) / 2;
+
+        // Draw the logo on top
+        ctx.drawImage(logo, x, y, logoSize, logoSize);
+      };
+
+      logo.onerror = (err) => {
+        console.error('Logo failed to load:', err);
+      };
+    } catch (error) {
+      console.error('QR Code generation error:', error);
     }
-  };
+  }
+};
+
 
   const handleInputChange = (e) => {
     const value = e.target.value;
@@ -62,9 +82,9 @@ export default function QRCodeGenerator() {
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
      <div>
            <h1 className="text-2xl font-bold p-1 bg-gradient-to-r from-indigo-500 to-purple-600 bg-clip-text text-transparent">
-    <span>{`</>`} DevCode</span>
-  </h1>
-</div>
+           <span>QR-Gen.</span>
+        </h1>
+      </div>
 
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
